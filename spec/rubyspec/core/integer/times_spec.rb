@@ -65,6 +65,20 @@ describe "Integer#times" do
     result.should == [0, 1, 2]
   end
 
+  it "use from keyword argument for initial value" do
+    result = []
+
+    3.times(from: 1) do |i|
+      result << i
+    end
+
+    result.should == [1, 2, 3]
+  end
+
+  it "use from keyword argument as Enumerator" do
+    3.times(from: 1).to_a.should == [1, 2, 3]
+  end
+
   describe "when no block is given" do
     describe "returned Enumerator" do
       describe "size" do

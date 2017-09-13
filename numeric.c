@@ -186,7 +186,7 @@ VALUE rb_cFixnum;
 VALUE rb_eZeroDivError;
 VALUE rb_eFloatDomainError;
 
-static ID id_to, id_by;
+static ID id_to, id_by, id_from;
 
 void
 rb_num_zerodiv(void)
@@ -4969,16 +4969,30 @@ int_dotimes_size(VALUE num, VALUE args, VALUE eobj)
 }
 
 static VALUE
-int_dotimes(VALUE num)
+int_dotimes(int argc, VALUE *argv, VALUE num)
 {
-    RETURN_SIZED_ENUMERATOR(num, 0, 0, int_dotimes_size);
+    VALUE hash;
+    long from;
+
+    RETURN_SIZED_ENUMERATOR(num, argc, argv, int_dotimes_size);
+
+    rb_scan_args(argc, argv, ":", &hash);
+    if (NIL_P(hash)) {
+	from = 0;
+    } else {
+	ID keys[1];
+	VALUE values[1];
+	keys[0] = id_from;
+	rb_get_kwargs(hash, keys, 0, 1, values);
+	from = FIX2LONG(values[0]);
+    }
 
     if (FIXNUM_P(num)) {
 	long i, end;
 
 	end = FIX2LONG(num);
 	for (i=0; i<end; i++) {
-	    rb_yield_1(LONG2FIX(i));
+	    rb_yield_1(LONG2FIX(i + from));
 	}
     }
     else {
@@ -5398,7 +5412,7 @@ Init_Numeric(void)
     rb_define_method(rb_cInteger, "even?", int_even_p, 0);
     rb_define_method(rb_cInteger, "upto", int_upto, 1);
     rb_define_method(rb_cInteger, "downto", int_downto, 1);
-    rb_define_method(rb_cInteger, "times", int_dotimes, 0);
+    rb_define_method(rb_cInteger, "times", int_dotimes, -1);
     rb_define_method(rb_cInteger, "succ", int_succ, 0);
     rb_define_method(rb_cInteger, "next", int_succ, 0);
     rb_define_method(rb_cInteger, "pred", int_pred, 0);
@@ -5600,6 +5614,7 @@ Init_Numeric(void)
 
     id_to = rb_intern("to");
     id_by = rb_intern("by");
+    id_from = rb_intern("from");
 }
 
 #undef rb_float_value
