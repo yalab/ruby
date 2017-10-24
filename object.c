@@ -2292,11 +2292,15 @@ static VALUE
 rb_mod_attr_reader(int argc, VALUE *argv, VALUE klass)
 {
     int i;
+    ID id;
+    VALUE ary = rb_ary_new_capa(argc);
 
     for (i=0; i<argc; i++) {
-	rb_attr(klass, id_for_attr(klass, argv[i]), TRUE, FALSE, TRUE);
+	id = id_for_attr(klass, argv[i]);
+	rb_attr(klass, id, TRUE, FALSE, TRUE);
+	rb_ary_push(ary, rb_id2sym(id));
     }
-    return Qnil;
+    return ary;
 }
 
 /**
@@ -2338,11 +2342,17 @@ static VALUE
 rb_mod_attr_writer(int argc, VALUE *argv, VALUE klass)
 {
     int i;
+    ID id;
+    ID attriv;
+    VALUE ary = rb_ary_new_capa(argc);
 
     for (i=0; i<argc; i++) {
-	rb_attr(klass, id_for_attr(klass, argv[i]), FALSE, TRUE, TRUE);
+	id = id_for_attr(klass, argv[i]);
+	rb_attr(klass, id, FALSE, TRUE, TRUE);
+	attriv = rb_intern_str(rb_sprintf("%"PRIsVALUE"=", rb_id2str(id)));
+	rb_ary_push(ary, rb_id2sym(attriv));
     }
-    return Qnil;
+    return ary;
 }
 
 /*
@@ -2366,11 +2376,18 @@ static VALUE
 rb_mod_attr_accessor(int argc, VALUE *argv, VALUE klass)
 {
     int i;
+    ID id;
+    ID attriv;
+    VALUE ary = rb_ary_new_capa(argc);
 
     for (i=0; i<argc; i++) {
-	rb_attr(klass, id_for_attr(klass, argv[i]), TRUE, TRUE, TRUE);
+	id = id_for_attr(klass, argv[i]);
+	rb_attr(klass, id, TRUE, TRUE, TRUE);
+	rb_ary_push(ary, rb_id2sym(id));
+	attriv = rb_intern_str(rb_sprintf("%"PRIsVALUE"=", rb_id2str(id)));
+	rb_ary_push(ary, rb_id2sym(attriv));
     }
-    return Qnil;
+    return ary;
 }
 
 /*

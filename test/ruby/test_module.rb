@@ -2221,6 +2221,14 @@ class TestModule < Test::Unit::TestCase
     end;
   end
 
+  def test_attr_return_value
+    c = Class.new
+
+    assert_equal(%i(reader1 reader2), c.class_eval { attr_reader(:reader1, :reader2) })
+    assert_equal(%i(writer1= writer2=), c.class_eval { attr_writer(:writer1, :writer2) })
+    assert_equal(%i(accessor1 accessor1= accessor2 accessor2=), c.class_eval { attr_accessor(:accessor1, :accessor2) })
+  end
+
   private
 
   def assert_top_method_is_private(method)
